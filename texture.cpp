@@ -16,10 +16,8 @@ float rot = 0.0f;
 GLfloat LightAmbient[] = { 0.5f, 0.5f, 0.5f, 1.0f };
 GLfloat LightDiffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 GLfloat LightPosition[] = { 0.0f, 0.0f, 2.0f, 1.0f };
-// penyimpanan 1 texture
-GLuint tex_2d;
 /* penyimpanan 1 texture */
-GLuint texture[1];
+GLuint texture[0];
 void init();
 void myKeyboard(unsigned char, int, int);
 void myDisplay(void);
@@ -41,29 +39,32 @@ int main(int argc, char* argv[])
     glutMainLoop();
     return 0;
 }
-GLuint LoadGLTextures() // Load bitmaps dan mengkonversi texture
+
+GLuint LoadGLTextures(const char* tex_name) // Load bitmaps dan mengkonversi texture
 {
-    /* load file image */
-    tex_2d = SOIL_load_OGL_texture("gambar/background.jpg",
-        SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
-    /* pengecekan eror */
-    if (tex_2d == 0) {
+
+	GLuint texture = SOIL_load_OGL_texture
+	(
+		tex_name,
+		SOIL_LOAD_AUTO,
+		SOIL_CREATE_NEW_ID,
+		SOIL_FLAG_INVERT_Y
+	);
+  if (tex_name == 0) {
         printf("kesalahan load pada file SOIL : '%s'\n",
             SOIL_last_result());
-    }
-    // menentukan tipe texture dari image
-    glBindTexture(GL_TEXTURE_2D, tex_2d);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    return tex_2d;
+  }
+	return texture;
 }
+
 void init()
 {
-    LoadGLTextures();
+    texture[1] = LoadGLTextures("gambar/taplak.jpg");
+    texture[2] = LoadGLTextures("gambar/tea_bg.jpg");
     glEnable(GL_TEXTURE_2D);
     glShadeModel(GL_SMOOTH);
-    // glClearColor(0.0f, 0.0f, 0.0f, 0.5f);
-    glClearColor(1.0f, 1.0f, 1.0f, 0.5f);
+    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+    // glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClearDepth(1.0f);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
@@ -73,6 +74,82 @@ void init()
     glLightfv(GL_LIGHT0, GL_POSITION, LightPosition);
     glEnable(GL_LIGHT0);
 }
+
+void draw_leg(float xt, float yt, float zt)
+{
+  glPushMatrix();
+  glTranslatef(xt, yt, zt); 
+  glScalef(0.1, 1, 0.1); 
+  glutSolidCube(1.0); 
+  glPopMatrix(); 
+}
+
+
+void draw_table() 
+{
+  // glColor4f(1.0,0, 0,1); 
+  glRotated(-90, 1, 0, 0);
+  glPushMatrix(); 
+  glTranslatef(0.0f, -0.945f, 0.0f);
+  // scale y for thickness
+  glScalef(2, 0.1, 2); 
+  glutSolidCube(1.0); 
+  glPopMatrix(); 
+
+  draw_leg(0.75,-0.45,-0.75); 
+  draw_leg(0.75,-0.45,0.75); 
+  draw_leg(-0.75,-0.45,-0.75); 
+  draw_leg(-0.75,-0.45,0.75); 
+
+  // membuat taplak
+	glBindTexture(GL_TEXTURE_2D, texture[1]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glBegin(GL_QUADS);
+  glNormal3f(0.0f, -1.0f, 0.0f);
+  glTexCoord2f(1.0f, 1.0f);
+  glVertex3f(-1.0f, -1.0f, -1.0f);
+  glTexCoord2f(0.0f, 1.0f);
+  glVertex3f(1.0f, -1.0f, -1.0f);
+  glTexCoord2f(0.0f, 0.0f);
+  glVertex3f(1.0f, -1.0f, 1.0f);
+  glTexCoord2f(1.0f, 0.0f);
+  glVertex3f(-1.0f, -1.0f, 1.0f);
+  glEnd();
+
+}
+
+
+void myDisplay(void)
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glLoadIdentity();
+
+    glTranslatef(x_pos, y_pos, z_pos);
+    glRotatef(60,-1.0f,0.0f,0.0f);
+    // glRotatef(yRot,0.0f,1.0f,0.0f);
+    glRotatef(zRot,0.0f,0.0f,1.0f);
+    draw_table();
+
+    // membuat teapot
+    glPushMatrix(); 
+    glBindTexture(GL_TEXTURE_2D, texture[2]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glRotated(180, -1, 0, 0);
+    glTranslatef(-0.8f, 1.2f, -0.5f);
+    glutSolidTeapot(0.2);
+    glPopMatrix(); 
+
+    glFlush();
+    xRot += 0.1f;
+    yRot += 0.1f;
+    zRot += 0.1f;
+    glutSwapBuffers();
+}
+
 void myKeyboard(unsigned char key, int x, int y)
 {
     switch (key) {
@@ -84,16 +161,16 @@ void myKeyboard(unsigned char key, int x, int y)
     case '.':
         z_pos += 0.1f;
         break;
-    case 'j':
+    case 'k':
         y_pos -= 0.1f;
         break;
-    case 'k':
+    case 'j':
         y_pos += 0.1f;
         break;
-    case 'h':
+    case 'l':
         x_pos -= 0.1f;
         break;
-    case 'l':
+    case 'h':
         x_pos += 0.1f;
         break;
     case 27:
@@ -103,97 +180,14 @@ void myKeyboard(unsigned char key, int x, int y)
         break;
     }
 }
-void myDisplay(void)
-{
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    glLoadIdentity();
-    glTranslatef(x_pos, y_pos, z_pos);
-    // glRotatef(xRot,0.0f,1.0f,0.0f);
-    // glRotatef(yRot,0.0f,1.0f,0.0f);
-    glRotatef(zRot,0.0f,0.0f,1.0f);
-    // glEnable(GL_BLEND); // enable BLENDING
-    // glColor3f(1.0, 0.5, 0.0); // Set warna BLENDING
-    // glScaled(0.5, 0.5, 0.5);
 
-    glBegin(GL_QUADS);
-    // depan
-    // glNormal3f(0.0f, 0.0f, 1.0f);
-    // glTexCoord2f(0.0f, 0.0f);
-    // glVertex3f(-1.0f, -1.0f, 1.0f);
-    // glTexCoord2f(1.0f, 0.0f);
-    // glVertex3f(1.0f, -1.0f, 1.0f);
-    // glTexCoord2f(1.0f, 1.0f);
-    // glVertex3f(1.0f, 1.0f, 1.0f);
-    // glTexCoord2f(0.0f, 1.0f);
-    // glVertex3f(-1.0f, 1.0f, 1.0f);
-    // belakang
-    glNormal3f(0.0f, 0.0f, -1.0f);
-    glTexCoord2f(1.0f, 0.0f);
-    glVertex3f(-1.0f, -1.0f, -1.0f);
-    glTexCoord2f(1.0f, 1.0f);
-    glVertex3f(-1.0f, 1.0f, -1.0f);
-    glTexCoord2f(0.0f, 1.0f);
-    glVertex3f(1.0f, 1.0f, -1.0f);
-    glTexCoord2f(0.0f, 0.0f);
-    glVertex3f(1.0f, -1.0f, -1.0f);
-    // atas
-    glNormal3f(0.0f, 1.0f, 0.0f);
-    glTexCoord2f(0.0f, 1.0f);
-    glVertex3f(-1.0f, 1.0f, -1.0f);
-    glTexCoord2f(0.0f, 0.0f);
-    glVertex3f(-1.0f, 1.0f, 1.0f);
-    glTexCoord2f(1.0f, 0.0f);
-    glVertex3f(1.0f, 1.0f, 1.0f);
-    glTexCoord2f(1.0f, 1.0f);
-    glVertex3f(1.0f, 1.0f, -1.0f);
-    // bawah
-    glNormal3f(0.0f, -1.0f, 0.0f);
-    glTexCoord2f(1.0f, 1.0f);
-    glVertex3f(-1.0f, -1.0f, -1.0f);
-    glTexCoord2f(0.0f, 1.0f);
-    glVertex3f(1.0f, -1.0f, -1.0f);
-    glTexCoord2f(0.0f, 0.0f);
-    glVertex3f(1.0f, -1.0f, 1.0f);
-    glTexCoord2f(1.0f, 0.0f);
-    glVertex3f(-1.0f, -1.0f, 1.0f);
-    // kanan
-    glNormal3f(1.0f, 0.0f, 0.0f);
-    glTexCoord2f(1.0f, 0.0f);
-    glVertex3f(1.0f, -1.0f, -1.0f);
-    glTexCoord2f(1.0f, 1.0f);
-    glVertex3f(1.0f, 1.0f, -1.0f);
-    glTexCoord2f(0.0f, 1.0f);
-    glVertex3f(1.0f, 1.0f, 1.0f);
-    glTexCoord2f(0.0f, 0.0f);
-    glVertex3f(1.0f, -1.0f, 1.0f);
-    // kiri
-    glNormal3f(-1.0f, 0.0f, 0.0f);
-    glTexCoord2f(0.0f, 0.0f);
-    glVertex3f(-1.0f, -1.0f, -1.0f);
-    glTexCoord2f(1.0f, 0.0f);
-    glVertex3f(-1.0f, -1.0f, 1.0f);
-    glTexCoord2f(1.0f, 1.0f);
-    glVertex3f(-1.0f, 1.0f, 1.0f);
-    glTexCoord2f(0.0f, 1.0f);
-    glVertex3f(-1.0f, 1.0f, -1.0f);
-    glEnd();
-
-    // glTranslatef(0, 0, 0);
-    glRotatef(180, 0, 1, 1);
-    glutSolidTeapot(0.2);
-    glFlush();
-    xRot += 0.1f;
-    yRot += 0.1f;
-    zRot += 0.1f;
-    glutSwapBuffers();
-}
 void myTimeOut(int id)
 {
     rot += 5.0f;
     glutPostRedisplay();
     glutTimerFunc(100, myTimeOut, 0);
 }
+
 void resize(int width, int height)
 {
     glViewport(0, 0, width, height);

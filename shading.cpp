@@ -34,16 +34,12 @@ void init(void) {
   glEnable(GL_DEPTH_TEST);
 }
 
-//prosedur memanggil objek bola
-void bola(void) {
-  glutWireSphere(0.5, 50, 20);
-}
-
+// membuat dedecahedron
 void dodecahedron(void) {
   glutWireDodecahedron();
 }
 
-//prosedur memanggil objek kubus
+// membuat kubus
 void kubus(void) {
   glutSolidCube(0.6);
 }
@@ -58,7 +54,6 @@ void cone(void) {
   glutSolidCone(0.5, 0.6, 20, 50);
 }
 
-//static GLdouble spin;
 void display(void) {
   const double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
   const double a = t * 90.0,
@@ -87,7 +82,7 @@ void display(void) {
 
   //kubus
   glPushMatrix();
-  glTranslatef(0.5, -0.5, -1.0);
+  glTranslatef(0.8, -0.5, -1.0);
   glRotatef(a, -1.0, -1.0, 1.0);
   kubus();
   glPopMatrix();
@@ -95,7 +90,7 @@ void display(void) {
   //torus
   glPushMatrix();
   glTranslatef(0, 0.5, -1.0);
-  glRotatef(a, 1.0, 1.0, 0.0);
+  glRotatef(a, b, 1.0, 0.0);
   torus();
   glPopMatrix();
 
