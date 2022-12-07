@@ -1,4 +1,3 @@
-#include <GL/freeglut_std.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <stdio.h>
@@ -88,34 +87,34 @@ void draw_leg(float xt, float yt, float zt)
 void draw_table() 
 {
   // glColor4f(1.0,0, 0,1); 
-  glRotated(-90, 1, 0, 0);
+  // glRotated(-90, 1, 0, 0);
   glPushMatrix(); 
-  glTranslatef(0.0f, -0.945f, 0.0f);
-  // scale y for thickness
-  glScalef(2, 0.1, 2); 
-  glutSolidCube(1.0); 
+    glPushMatrix(); 
+
+    // alas meja
+    glTranslatef(0.0f, 0.945f, 0.0f);
+    glScalef(2, 0.1, 2); // scale y buat ketebalan 
+    glutSolidCube(1.0); 
+    glPopMatrix(); 
+
+    // kaki meja
+    draw_leg(0.75,0.4,-0.75); 
+    draw_leg(0.75,0.4,0.75); 
+    draw_leg(-0.75,0.4,-0.75); 
+    draw_leg(-0.75,0.4,0.75); 
+
+    // taplak meja
+    glBindTexture(GL_TEXTURE_2D, texture[1]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBegin(GL_QUADS);
+    glNormal3f( 0.0f, 1.0f, 0.0f);
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f, 1.0f, -1.0f);
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, 1.0f, 1.0f);
+    glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, 1.0f, 1.0f);
+    glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, 1.0f, -1.0f);
+    glEnd();
   glPopMatrix(); 
-
-  draw_leg(0.75,-0.45,-0.75); 
-  draw_leg(0.75,-0.45,0.75); 
-  draw_leg(-0.75,-0.45,-0.75); 
-  draw_leg(-0.75,-0.45,0.75); 
-
-  // membuat taplak
-	glBindTexture(GL_TEXTURE_2D, texture[1]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glBegin(GL_QUADS);
-  glNormal3f(0.0f, -1.0f, 0.0f);
-  glTexCoord2f(1.0f, 1.0f);
-  glVertex3f(-1.0f, -1.0f, -1.0f);
-  glTexCoord2f(0.0f, 1.0f);
-  glVertex3f(1.0f, -1.0f, -1.0f);
-  glTexCoord2f(0.0f, 0.0f);
-  glVertex3f(1.0f, -1.0f, 1.0f);
-  glTexCoord2f(1.0f, 0.0f);
-  glVertex3f(-1.0f, -1.0f, 1.0f);
-  glEnd();
 
 }
 
@@ -127,9 +126,10 @@ void myDisplay(void)
     glLoadIdentity();
 
     glTranslatef(x_pos, y_pos, z_pos);
-    glRotatef(60,-1.0f,0.0f,0.0f);
-    // glRotatef(yRot,0.0f,1.0f,0.0f);
-    glRotatef(zRot,0.0f,0.0f,1.0f);
+    // glTranslatef(0, -0.5, z_pos);
+    glRotatef(25,0.5f,0.0f,0.0f);
+    // glRotatef(xRot,0.0f,1.0f,0.0f);
+    glRotatef(zRot,0.0f,1.0f,0.0f);
     draw_table();
 
     // membuat teapot
@@ -138,8 +138,7 @@ void myDisplay(void)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glRotated(180, -1, 0, 0);
-    glTranslatef(-0.8f, 1.2f, -0.5f);
+    glTranslatef(-0.8f, 1.15f, -0.5f);
     glutSolidTeapot(0.2);
     glPopMatrix(); 
 
@@ -161,6 +160,9 @@ void myKeyboard(unsigned char key, int x, int y)
     case '.':
         z_pos += 0.1f;
         break;
+    case 'h':
+        x_pos += 0.1f;
+        break;
     case 'k':
         y_pos -= 0.1f;
         break;
@@ -169,9 +171,6 @@ void myKeyboard(unsigned char key, int x, int y)
         break;
     case 'l':
         x_pos -= 0.1f;
-        break;
-    case 'h':
-        x_pos += 0.1f;
         break;
     case 27:
         exit(0);
@@ -193,8 +192,7 @@ void resize(int width, int height)
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(45.0, (GLdouble)width / (GLdouble)height, 1.0,
-        300.0);
+    gluPerspective(45.0, (GLdouble)width / (GLdouble)height, 1.0, 300.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }
