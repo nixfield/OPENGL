@@ -3,22 +3,9 @@
 #include <GL/glut.h>
 
 void init(void) {
-  GLfloat mat_specular[] = {
-    1.0,
-    1.0,
-    1.0,
-    1.0
-  };
-  GLfloat mat_shininess[] = {
-    50.0
-  };
-  GLfloat light_position[] = {
-    0.0,
-    1.0,
-    1.0,
-    1.0
-  };
-
+  GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+  GLfloat mat_shininess[] = { 50.0 };
+  GLfloat light_position[] = { 0.0, 1.0, 1.0, 1.0 };
   GLfloat red[] = { 1.0, 0.0, 0.0, 1.0 };
 
   glClearColor(1.0, 1.0, 1.0, 1.0);
