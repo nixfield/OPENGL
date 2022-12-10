@@ -1,9 +1,9 @@
 Compile
-'''sh-session
+```sh-session
 g++ shading.cpp -o shading -lGL -lGLU -lglut
-'''
+```
 
 Run
-'''sh-session
+```sh-session
 ./shading
-'''
+```
