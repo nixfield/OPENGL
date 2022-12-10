@@ -1,9 +1,9 @@
 Compile
-'''sh-session
+```sh-session
 g++ texture.cpp -o texture -lGL -lGLU -lglut -lSOIL
-'''
+```
 
 Run
-'''sh-session
+```sh-session
 ./texture
-'''
+```
