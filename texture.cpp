@@ -1,22 +1,28 @@
-#include <GL/gl.h>
-#include <GL/glu.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-#include <SOIL/SOIL.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 #include <GL/glut.h>
+#include <SOIL/SOIL.h>
 
 float z_pos = -5.0f;
 float y_pos = 0.0f;
 float x_pos = 0.0f;
 float xRot, yRot, zRot;
 float rot = 0.0f;
+
+// GLfloat LightPosition[] = { 0.0f, 1.0f, 1.0f, 1.0f };
+GLfloat LightPosition[] = { 1.0f, 1.0f, 1.0f, 0.0f };
 GLfloat LightAmbient[] = { 0.5f, 0.5f, 0.5f, 1.0f };
 GLfloat LightDiffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-GLfloat LightPosition[] = { 0.0f, 0.0f, 2.0f, 1.0f };
+GLfloat MatSpecular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+GLfloat MatShininess[] = { 50.0f };
+
 /* penyimpanan 1 texture */
 GLuint texture[0];
+
 void init();
 void myKeyboard(unsigned char, int, int);
 void myDisplay(void);
@@ -65,13 +71,18 @@ void init()
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
     // glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClearDepth(1.0f);
-    glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
+    // light & shading
+    glMaterialfv(GL_FRONT, GL_SPECULAR, MatSpecular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, MatShininess);
+    glLightfv(GL_LIGHT0, GL_POSITION, LightPosition);
     glLightfv(GL_LIGHT0, GL_AMBIENT, LightAmbient);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, LightDiffuse);
-    glLightfv(GL_LIGHT0, GL_POSITION, LightPosition);
     glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_DEPTH_TEST);
 }
 
 void draw_leg(float xt, float yt, float zt)
@@ -124,10 +135,11 @@ void myDisplay(void)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glLoadIdentity();
+    glEnable(GL_COLOR_MATERIAL);
+    glColorMaterial(GL_FRONT, GL_SPECULAR);
 
     glTranslatef(x_pos, y_pos, z_pos);
-    // glTranslatef(0, -0.5, z_pos);
-    glRotatef(25,0.5f,0.0f,0.0f);
+    glRotatef(30,1.0f,0.0f,0.0f);
     // glRotatef(xRot,0.0f,1.0f,0.0f);
     glRotatef(zRot,0.0f,1.0f,0.0f);
     draw_table();
@@ -142,6 +154,7 @@ void myDisplay(void)
     glutSolidTeapot(0.2);
     glPopMatrix(); 
 
+    glDisable(GL_COLOR_MATERIAL);
     glFlush();
     xRot += 0.1f;
     yRot += 0.1f;
