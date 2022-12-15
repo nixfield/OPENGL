@@ -7,3 +7,5 @@ Run
 ```sh-session
 ./lighting
 ```
+
+![red lighting with shading - opengl](lighting.gif)

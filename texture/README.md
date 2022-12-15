@@ -7,3 +7,4 @@ Run
 ```sh-session
 ./texture
 ```
+![table and teapot with texture and shading - opengl](texture.gif)
